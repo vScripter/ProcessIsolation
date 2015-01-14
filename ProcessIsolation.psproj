@@ -1,0 +1,11 @@
+﻿<Project>
+  <Version>1</Version>
+  <FileID>db03dd04-3e28-4174-aa9d-b6f19ce77431</FileID>
+  <ProjectType>1</ProjectType>
+  <Files>
+    <File ReferenceName="" Build="2">ProcessIsolation.psd1</File>
+    <File ReferenceName="" Build="0">ProcessIsolation.psm1</File>
+  </Files>
+  <StartupScript>
+  </StartupScript>
+</Project>
