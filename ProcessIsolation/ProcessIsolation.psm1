@@ -180,13 +180,13 @@ function Get-ServiceType {
 	
 	[cmdletbinding()]
 	param (
-		[parameter(Mandatory = $false,
+		[parameter(Mandatory = $true,
 				   Position = 0,
 				   ValueFromPipeline = $false,
 				   ValueFromPipelineByPropertyName = $false,
 				   HelpMessage = 'Enter name of computer')]
 		[alias('CN')]
-		[System.String[]]$ComputerName = 'localhost',
+		[String[]]$ComputerName,
 		
 		[parameter(Mandatory = $true,
 				   Position = 1,
@@ -195,7 +195,7 @@ function Get-ServiceType {
 				   HelpMessage = 'Enter name of service')]
 		[alias('Name', 'N')]
 		[validatenotnullorempty()]
-		[System.String]$ServiceName
+		[String]$ServiceName
 	)
 	
 	BEGIN {
@@ -239,7 +239,7 @@ function Get-ServiceType {
 	} # end END block
 } # end function Get-ServiceType
 
-function Set-ServiceType {
+function Set-ServiceIsolation {
 	<#
 	.SYNOPSIS
 		This function will set the isolation type to 'Own' or 'Shared' depending on your need
@@ -262,7 +262,7 @@ function Set-ServiceType {
 	.OUTPUTS
 		N/A
 	.EXAMPLE
-		Set-ServiceType -ComputerName localhost -ServiceName wuauserv -IsolationType Own -Verbose
+		Set-ServiceIsolation -ComputerName localhost -ServiceName wuauserv -IsolationType Own -Verbose
 	.NOTES
 	
 		#TAG:PUBLIC
@@ -438,6 +438,6 @@ function Set-ServiceType {
 		#
 	} # end END block
 	
-} # end function Set-ServiceType
+} # end function Set-ServiceProcessIsolation
 
 Export-ModuleMember *
