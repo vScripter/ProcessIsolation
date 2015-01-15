@@ -3,9 +3,9 @@
 This module can be used to find and isolate service processes, mainly for troubleshooting.
 
 It consists of 3 functions:
-* Get-ProcessServices
-* Get-ServiceType
-* Set-ServiceType
+* [**Get-ProcessServices**](Get-ProcessServices)
+* **Get-ServiceType**
+* **Set-ServiceType**
 
 ## Get-ProcessServices
 
