@@ -10,15 +10,15 @@ It consists of 3 functions:
 ## Get-ProcessServices
 
 At it's core, this function executes:
-'''
+```
 tasklist.exe /S $computer /SVC /FI "IMAGENAME eq $processName" /FO CSV
-'''
+```
 
 Which is then sent to ConvertFrom-CSV
 
 This function supports pipeline input, **however**, be very careful gathering information on a process name that may be running multiple instances.
 
-'''
+```
 C:\> Get-ProcessServices -ProcessName svchost.exe -Verbose | ft -a
 
 VERBOSE: Gathering service associations on localhost
@@ -40,13 +40,13 @@ localhost    svchost.exe 2524      FDResPub,SSDPSRV,TBS,upnphost
 localhost    svchost.exe 3316      RemoteRegistry
 localhost    svchost.exe 4940      PolicyAgent
 localhost    svchost.exe 9460      stisvc
-'''
+```
 
 ## Get-ServiceType
 
 This function uses WMI to gather detail about the service type (Shared/Own) on a designated computer/s. It also accepts pipeline input.
 
-'''
+```
 C:\> Get-ServiceType -ServiceName wuauserv -Verbose| ft -a
 
 VERBOSE: Checking 'wuauserv' service type on localhost
@@ -55,7 +55,7 @@ VERBOSE: Checking 'wuauserv' service type on localhost
 ComputerName ServiceName ServiceDescription ServiceStatus ServiceType
 ------------ ----------- ------------------ ------------- -----------
 localhost    wuauserv    Windows Update           Running Shared
-'''
+```
 
 ## Set-ServiceType
 
@@ -65,7 +65,7 @@ Since this can potentially produce undesired activity, this function fully suppo
 
 This function supports pipeline input.
 
-'''
+```
 C:\> Set-ServiceType -ComputerName localhost -ServiceName wuauserv -IsolationType Own -RestartService -Verbose -Confirm:$false
 
 VERBOSE: Setting isolation to 'Own' for the 'wuauserv' service on localhost
@@ -80,3 +80,4 @@ ServiceName        : wuauserv
 ServiceDescription : Windows Update
 ServiceStatus      : Running
 ServiceType        : Own
+```
