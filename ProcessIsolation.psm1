@@ -17,48 +17,70 @@ function Get-ProcessServices {
 		This function will return all of the services associated with the process instance/s based on the process name you provide
 	.DESCRIPTION
 		This function uses tasklist.exe to return service-to-process (image) associations for the means of toubleshooting.
-	
+
 		A common example of this would be if you were troubleshooting a performance issue related to a service process running underneath one of the svchost.exe
 		processes.
-	
+
 		You can use this function to identify what you want to isolate and then use the Set-ServiceIsolation function to actually set isolation.
+	
+		WARNING: Avoid supplying pipeline input when working with a single, or multiple computers, and specifying a process that runs multiple instances of the same name (ex: svchost.exe).
+		If there are multiple instances of a process running (like svchost.exe), when you use pipeline input, like: {Get-Process svchost | Get-ProcessServices}
+		be aware that it will run over and over, the number of times equal to the number of process instances, therefore producing undesired output. This also goes for
+		specifying multiple computer names to Get-Process and then trying to send that list through the pipeline. 
+	
 	.PARAMETER ComputerName
 		Name of computer you wish to run the command against.
 	.PARAMETER ProcessName
-		Name of process
+		Name of process in the format of 'process' or 'process.exe'
 	.INPUTS
 		System.String
 	.OUTPUTS
 		PSCustomObject
 	.EXAMPLE
+		Get-ProcessServices -ComputerName SERVER1,SERVER2 -ProcessName svchost.exe -Verbose | Format-Table -AutoSize
+	.EXAMPLE
+		Get-ProcessServices -ComputerName SERVER1,SERVER2 -ProcessName spoolsv -Verbose | Format-Table -AutoSize
+	.EXAMPLE
+		Get-Process -Name spoolsv -ComputerName SERVER1,SERVER2 | Get-ProcessServices -Verbose | Format-Table -AutoSize
+	.EXAMPLE
+		Get-Process -Name svchost | Select-Object -Unique | Get-ProcessServices -Verbose | Format-Table -AutoSize
+	
+		Per the warning note in the description, for running processes that have the same name, be sure to specify a single, unique process name when
+		sending data through the pipeline, for optimal results
+	.EXAMPLE
+		Get-Process -Name svchost -ComputerName SERVER1 | Select-Object -Unique | Get-ProcessServices -Verbose | Format-Table -AutoSize
+	
+		Per the warning note in the description, for running processes that have the same name, be sure to specify a single computer AND ans single unique 
+		process name when sending data through the pipeline, for optimal results
+	.EXAMPLE
 		Get-ProcessServices -ComputerName localhost -ProcessName svchost.exe -Verbose | Format-Table -AutoSize
 
-ComputerName ProcessName ProcessID Services                                                                                                                            
------------- ----------- --------- --------                                                                                                                            
-localhost    svchost.exe 664       DcomLaunch,PlugPlay,Power                                                                                                           
-localhost    svchost.exe 1108      RpcEptMapper,RpcSs                                                                                                                  
-localhost    svchost.exe 1204      AudioSrv,Dhcp,eventlog,HomeGroupProvider,lmhosts,wscsvc                                                                             
-localhost    svchost.exe 1288      AudioEndpointBuilder,CscService,hidserv,Netman,PcaSvc,TabletInputService,TrkWks,UmRdpService,UxSms,Wlansvc,wudfsvc                  
-localhost    svchost.exe 1312      EventSystem,fdPHost,FontCache,netprofm,nsi,W32Time,WdiServiceHost,WinHttpAutoProxySvc                                               
+ComputerName ProcessName ProcessID Services
+------------ ----------- --------- --------
+localhost    svchost.exe 664       DcomLaunch,PlugPlay,Power
+localhost    svchost.exe 1108      RpcEptMapper,RpcSs
+localhost    svchost.exe 1204      AudioSrv,Dhcp,eventlog,HomeGroupProvider,lmhosts,wscsvc
+localhost    svchost.exe 1288      AudioEndpointBuilder,CscService,hidserv,Netman,PcaSvc,TabletInputService,TrkWks,UmRdpService,UxSms,Wlansvc,wudfsvc
+localhost    svchost.exe 1312      EventSystem,fdPHost,FontCache,netprofm,nsi,W32Time,WdiServiceHost,WinHttpAutoProxySvc
 localhost    svchost.exe 1352      AeLookupSvc,BITS,Browser,CertPropSvc,EapHost,IKEEXT,iphlpsvc,LanmanServer,ProfSvc,Schedule,SENS,SessionEnv,ShellHWDetection
-localhost    svchost.exe 1564      gpsvc                                                                                                                               
-localhost    svchost.exe 1968      CryptSvc,Dnscache,LanmanWorkstation,NlaSvc,TermService,WinRM                                                                        
-localhost    svchost.exe 2104      BFE,DPS,MpsSvc                                                                                                                      
-localhost    svchost.exe 2372      bthserv                                                                                                                             
-localhost    svchost.exe 2524      FDResPub,SSDPSRV,TBS,upnphost                                                                                                       
-localhost    svchost.exe 3316      RemoteRegistry                                                                                                                      
-localhost    svchost.exe 4940      PolicyAgent                                                                                                                         
-localhost    svchost.exe 9460      stisvc                                                                                                                              
+localhost    svchost.exe 1564      gpsvc
+localhost    svchost.exe 1968      CryptSvc,Dnscache,LanmanWorkstation,NlaSvc,TermService,WinRM
+localhost    svchost.exe 2104      BFE,DPS,MpsSvc
+localhost    svchost.exe 2372      bthserv
+localhost    svchost.exe 2524      FDResPub,SSDPSRV,TBS,upnphost
+localhost    svchost.exe 3316      RemoteRegistry
+localhost    svchost.exe 4940      PolicyAgent
+localhost    svchost.exe 9460      stisvc
 localhost    svchost.exe 13704     wuauserv
 	.NOTES
-	
+
 		#TAG:PUBLIC
-		
+
 			GitHub: https://github.com/vN3rd
 			Twitter: @vN3rd
 			Email: kevin@vmotioned.com
 			Blog: www.vMotioned.com
-	
+
 	[-------------------------------------DISCLAIMER-------------------------------------]
 	 All script are provided as-is with no implicit
 	 warranty or support. It's always considered a best practice
@@ -68,7 +90,7 @@ localhost    svchost.exe 13704     wuauserv
 	 If you have questions or issues, please reach out/report them on
 	 my GitHub page. Thanks for your support!
 	[-------------------------------------DISCLAIMER-------------------------------------]
-	
+
 	.LINK
 		https://github.com/vN3rd
 
@@ -78,71 +100,79 @@ localhost    svchost.exe 13704     wuauserv
 	param (
 		[parameter(Mandatory = $false,
 				   Position = 0,
-				   ValueFromPipeline = $false,
-				   ValueFromPipelineByPropertyName = $false,
+				   ValueFromPipelineByPropertyName = $true,
 				   HelpMessage = 'Name of computer to query')]
-		[alias('CN')]
-		[System.String]$ComputerName = 'localhost',
-	
+		[alias('CN', 'MachineName')]
+		[System.String[]]$ComputerName = 'localhost',
+		
 		[parameter(Mandatory = $true,
 				   Position = 1,
-				   ValueFromPipeline = $false,
-				   ValueFromPipelineByPropertyName = $false,
+				   ValueFromPipelineByPropertyName = $true,
 				   HelpMessage = 'Name of process (ex: svchost.exe')]
 		[alias('Name', 'PN')]
-		[System.String]$ProcessName		
+		[System.String]$ProcessName
 	)
 	
 	BEGIN {
-		$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
-		$finalResults = @()
+		#Write-Verbose -Message 'Entering BEGIN block'
 		
 	} # end BEGIN block
 	
 	PROCESS {
-		$taskListQuery = $null
-		$p = $null
+		#Write-Verbose -Message 'Entering PROCESS block'
 		
-		if (-not ($processName -like '*.exe')) {
-			$ProcessName = $ProcessName + '.exe'
-		} # end if
+		if ($ComputerName -eq '.') {
+			$ComputerName = 'localhost'
+		}
 		
-		Write-Verbose -Message 'Gathering service associations'
-		$imageName = @{ name = 'ImageName'; Expression = { $_.'Image Name' } }
-		
-		$taskListQuery = tasklist.exe /S $ComputerName /SVC /FI "IMAGENAME eq $processName" /FO CSV |
-		ConvertFrom-Csv |
-		Select-Object $imageName, PID, Services
-		
-		foreach ($p in $taskListQuery) {
-			$objTaskList = @()
-			
-			$objTaskList = [PSCustomObject] @{
-				ComputerName = $ComputerName
-				ProcessName = $p.ImageName
-				ProcessID = $p.PID
-				Services = $p.Services
-			} # end $objTaskList
-			
-			$finalResults += $objTaskList
-		} # end foreach $p
+		foreach ($computer in $ComputerName) {
+			if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
+				$taskListQuery = $null
+				$p = $null
+				
+				if (-not ($processName -like '*.exe')) {
+					$ProcessName = $ProcessName + '.exe'
+				} # end if
+				
+				Write-Verbose -Message "Gathering service associations on $computer"
+				$imageName = @{ name = 'ImageName'; Expression = { $_.'Image Name' } }
+				
+				$taskListQuery = tasklist.exe /S $computer /SVC /FI "IMAGENAME eq $processName" /FO CSV |
+				ConvertFrom-Csv |
+				Select-Object $imageName, PID, Services
+				
+				foreach ($p in $taskListQuery) {
+					$objTaskList = @()
+					
+					$objTaskList = [PSCustomObject] @{
+						ComputerName = $computer
+						ProcessName = $p.ImageName
+						ProcessID = $p.PID
+						Services = $p.Services
+					} # end $objTaskList
+					
+					$objTaskList
+				} # end foreach $p
+			} else {
+				Write-Warning -Message "$computer - Unreachable via Ping"
+			} # end if/else Test-Connection
+		} # end foreach $computer
 		
 	} # end PROCESS block
 	
 	END {
-		
-		$finalResults
-		
+		#Write-Verbose -Message 'Entering END block'
+		# Do cleanup work here
 	} # end END block
 } # end function Get-ProcessServices
 
 function Get-ServiceType {
 	<#
 	.SYNOPSIS
-		This function will gather service type deatil on one, or more, computers. 
+		This function will gather service type deatil on one, or more, computers.
 	.DESCRIPTION
 		This function was written to complement Set-ServiceIsolation.
-	
+
 		It will return the service type for a single service on one, or more, computers
 	.PARAMETER ComputerName
 		Name of computer/s
@@ -154,15 +184,15 @@ function Get-ServiceType {
 		Get-ServiceType -ComputerName localhost -ServiceName wuauserv -Verbose | ft -a
 	.EXAMPLE
 	.NOTES
-	
-	
+
+
 		#TAG:PUBLIC
-		
+
 			GitHub: https://github.com/vN3rd
 			Twitter: @vN3rd
 			Email: kevin@vmotioned.com
 			Blog: www.vMotioned.com
-	
+
 	[-------------------------------------DISCLAIMER-------------------------------------]
 	 All script are provided as-is with no implicit
 	 warranty or support. It's always considered a best practice
@@ -172,26 +202,24 @@ function Get-ServiceType {
 	 If you have questions or issues, please reach out/report them on
 	 my GitHub page. Thanks for your support!
 	[-------------------------------------DISCLAIMER-------------------------------------]
-	
+
 	.LINK
 		https://github.com/vN3rd
-	
+
 	#>
 	
 	[cmdletbinding()]
 	param (
 		[parameter(Mandatory = $false,
 				   Position = 0,
-				   ValueFromPipeline = $false,
-				   ValueFromPipelineByPropertyName = $false,
+				   ValueFromPipelineByPropertyName = $true,
 				   HelpMessage = 'Enter name of computer')]
-		[alias('CN')]
+		[alias('CN', 'MachineName')]
 		[System.String[]]$ComputerName = 'localhost',
 		
 		[parameter(Mandatory = $true,
 				   Position = 1,
-				   ValueFromPipeline = $false,
-				   ValueFromPipelineByPropertyName = $false,
+				   ValueFromPipelineByPropertyName = $true,
 				   HelpMessage = 'Enter name of service')]
 		[alias('Name', 'N')]
 		[validatenotnullorempty()]
@@ -199,43 +227,46 @@ function Get-ServiceType {
 	)
 	
 	BEGIN {
-		
-		$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
-		$finalResults = @()
-		
+		#Write-Verbose -Message 'Entering BEGIN block'
+		# begin stuff
 	} # end BEGIN block
 	
 	PROCESS {
+		#Write-Verbose -Message 'Entering PROCESS block'
 		
-		foreach ($comp in $ComputerName) {
-			if (Test-Connection -ComputerName $comp -Count 1 -Quiet) {
+		foreach ($computer in $ComputerName) {
+			if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
 				$objSvcCheck = @()
 				$svcCheck = $null
 				
-				Write-Verbose -Message "Checking service type for '$serviceName' on $comp"
-				$svcCheck = Get-Service -ComputerName $comp -Name $serviceName | Select-Object Name, DisplayName, Status, ServiceType
-				
-				$objSvcCheck = [PSCustomObject] @{
-					ComputerName = $comp
-					ServiceName = $svcCheck.Name
-					ServiceDescription = $svcCheck.DisplayName
-					ServiceStatus = $svcCheck.Status
-					ServiceType = $(
-					if ($svcCheck.ServiceType -eq 'Win32OwnProcess') { 'Own' }
-					if ($svcCheck.ServiceType -eq 'Win32ShareProcess') { 'Shared' }
-					)
-				} # end $objSvcCheck
-				
-				$finalResults += $objSvcCheck
+				try {
+					Write-Verbose -Message "Checking '$serviceName' service type on $computer"
+					$svcCheck = Get-Service -ComputerName $computer -Name $serviceName -ErrorAction 'Stop' | Select-Object Name, DisplayName, Status, ServiceType
+					
+					$objSvcCheck = [PSCustomObject] @{
+						ComputerName = $computer
+						ServiceName = $svcCheck.Name
+						ServiceDescription = $svcCheck.DisplayName
+						ServiceStatus = $svcCheck.Status
+						ServiceType = $(
+						if ($svcCheck.ServiceType -eq 'Win32OwnProcess') { 'Own' }
+						if ($svcCheck.ServiceType -eq 'Win32ShareProcess') { 'Shared' }
+						)
+					} # end $objSvcCheck
+					
+					$objSvcCheck
+				} catch {
+					Write-Warning -Message "Error gathering services on $computer - $_"
+				} # end try/catch
 			} else {
-				Write-Warning -Message "$Comp - unreachable by ping"
+				Write-Warning -Message "$computer - Unreachable via Ping"
 			} # end if/else
 		} # end foreach
 		
-	} # end PROCESS blocl
+	} # end PROCESS block
 	
 	END {
-		$finalResults
+		#Write-Verbose -Message 'Entering END block'
 	} # end END block
 } # end function Get-ServiceType
 
@@ -245,10 +276,10 @@ function Set-ServiceType {
 		This function will set the isolation type to 'Own' or 'Shared' depending on your need
 	.DESCRIPTION
 		This function uses WMI to set the desired isolation type for the given service
-	
+
 		A common example of this would be if you were troubleshooting a performance issue related to a service process running underneath one of the svchost.exe
 		processes, such as wuauserv (Windows Update)
-	
+
 		It requires the Get-ServiceType function, which is part of this module; Get-ServiceType is used to confirm service type in this module. You can use Get-ServiceType
 		by itself to gather information about local services.
 	.PARAMETER ComputerName
@@ -257,21 +288,25 @@ function Set-ServiceType {
 		Name of service
 	.PARAMETER IsolationType
 		Select the type of isolation; either 'Own' or 'Shared'
+	.PARAMETER RestartService
+		Use the switch to attempt to restart the service, after the type change is made
 	.INPUTS
 		System.String
 	.OUTPUTS
 		N/A
 	.EXAMPLE
-		Set-ServiceType -ComputerName localhost -ServiceName wuauserv -IsolationType Own -Verbose
+		Set-ServiceIsolation -ComputerName localhost -ServiceName wuauserv -IsolationType Own -RestartService -Verbose -Whatif
+	.EXAMPLE
+		Get-Service wuauserv | Set-ServiceIsolation -IsolationType Own -RestartService -Verbose -Confirm:$false
 	.NOTES
-	
+
 		#TAG:PUBLIC
-		
+
 			GitHub: https://github.com/vN3rd
 			Twitter: @vN3rd
 			Email: kevin@vmotioned.com
 			Blog: www.vMotioned.com
-	
+
 	[-------------------------------------DISCLAIMER-------------------------------------]
 	 All script are provided as-is with no implicit
 	 warranty or support. It's always considered a best practice
@@ -281,27 +316,24 @@ function Set-ServiceType {
 	 If you have questions or issues, please reach out/report them on
 	 my GitHub page. Thanks for your support!
 	[-------------------------------------DISCLAIMER-------------------------------------]
-	
+
 	.LINK
 		https://github.com/vN3rd
-	
+
 	#>
 	
-	[cmdletbinding(PositionalBinding = $true)]
+	[cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 	param (
 		[parameter(Mandatory = $false,
 				   Position = 0,
-				   ValueFromPipeline = $false,
 				   ValueFromPipelineByPropertyName = $false,
 				   HelpMessage = 'Enter name of computer')]
 		[alias('CN')]
-		[validatescript({ Test-Connection -ComputerName $_ -Count 1 -Quiet })]
-		[System.String]$ComputerName = 'localhost',
-	
+		[System.String[]]$ComputerName = 'localhost',
+		
 		[parameter(Mandatory = $true,
 				   Position = 1,
-				   ValueFromPipeline = $false,
-				   ValueFromPipelineByPropertyName = $false,
+				   ValueFromPipelineByPropertyName = $true,
 				   HelpMessage = 'Enter name of service')]
 		[alias('Name', 'N')]
 		[validatenotnullorempty()]
@@ -310,16 +342,24 @@ function Set-ServiceType {
 		[parameter(Mandatory = $true,
 				   Position = 2,
 				   ValueFromPipeline = $false,
-				   ValueFromPipelineByPropertyName = $false,
 				   HelpMessage = "Select Isolation type (Valid Values Are 'Own' and 'Shared'")]
 		[validateset('Own', 'Shared')]
-		[System.String]$IsolationType
+		[System.String]$IsolationType,
+		
+		[parameter(Mandatory = $false)]
+		[switch]$RestartService
 	)
 	
 	BEGIN {
-		$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+		#Write-Verbose -Message 'Entering BEGIN block'
 		
 		[int]$setIsolation = $null
+		
+		if ($IsolationType -eq 'Own') {
+			$setIsolation = 16
+		} elseif ($IsolationType -eq 'Shared') {
+			$setIsolation = 32
+		} # end if/else $IsolationType
 		
 		function Get-ReturnCode {
 			[cmdletbinding()]
@@ -356,88 +396,87 @@ function Set-ServiceType {
 			} # end switch block
 		} # end function Get-ReturnCode
 		
+		function Invoke-ServiceTypeChange {
+			[cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+			param (
+				$Computer,
+				$ServiceName,
+				$IsolationType
+			)
+			
+			if ($PSCmdlet.ShouldProcess("$computer", "Setting Service '$serviceName' to type '$IsolationType'")) {
+				Write-Verbose -Message "Setting isolation to 'Own' for the '$serviceName' service on $computer"
+				try {
+					$invokeMethod = Get-WmiObject -ComputerName $Computer -Class win32_service -Filter "name='$serviceName'" -ErrorAction 'Stop' |
+					Invoke-WmiMethod -Name Change -ArgumentList @($null, $null, $null, $null, $null, $null, $null, $setIsolation) -ErrorAction 'Stop'
+					
+					$invokeReturnCode = $invokeMethod.ReturnValue
+					$returnCodeResult = Get-ReturnCode -ReturnCode $invokeReturnCode
+					
+					if ($invokeReturnCode -eq '0') {
+						Write-Verbose -Message "SUCCESS: Service Type Change - $returnCodeResult"
+					} else {
+						Write-Warning -Message "ERROR: Service Type Change - $returnCodeResult"
+						Write-Warning -Message "Potential issues setting the service type on $computer. Please manually investigate."
+					} # end if/else $invokeReturnCode
+					
+				} catch {
+					Write-Warning -Message "Error invoking WMI method on $computer"
+					Write-Warning -Message 'Exiting'
+					Exit
+				} # end try/catch block
+			} # end if $PSCmdlet.ShouldProcess
+		} # end function Invoke-ServiceTypeChange
+		
+		function Restart-SelectedService {
+			[cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+			param (
+				$Computer,
+				$ServiceName
+			)
+			
+			if ($PSCmdlet.ShouldProcess("$computer", "Restarting Service '$serviceName'")) {
+				try {
+					Get-Service -ComputerName $Computer -Name $serviceName | Restart-Service -Verbose
+					
+					Get-ServiceType -ComputerName $Computer -ServiceName $ServiceName -Verbose
+					
+				} catch {
+					Write-Warning -Message "Error attempting service restart - $_"
+				} # end try/catch
+			} # end if $PSCmdlet.ShouldProcess
+		} # end function Restart-SelectedService
+		
 	} # end BEGIN block
 	
 	PROCESS {
+		#Write-Verbose -Message 'Entering PROCESS block'
 		
-		$svcCheck = $Null
-		
-		switch ($IsolationType) {
-			'Own' {
-				$setIsolation = 16
+		foreach ($computer in $ComputerName) {
+			if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
 				
-				Write-Verbose -Message "Setting isolation to 'Own' for the $serviceName service"
-				$invokeMethod = Get-WmiObject -ComputerName $ComputerName -Class win32_service -Filter "name='$serviceName'" |
-				Invoke-WmiMethod -Name Change -ArgumentList @($null, $null, $null, $null, $null, $null, $null, $setIsolation)
+				Invoke-ServiceTypeChange -Computer $computer -ServiceName $ServiceName -IsolationType $IsolationType
 				
-				$invokeReturnCode = $invokeMethod.ReturnValue
-				$returnCodeResult = Get-ReturnCode -ReturnCode $invokeReturnCode
+				if ($RestartService) {
+					
+					Restart-SelectedService -Computer $computer -ServiceName $ServiceName
+					
+				} # end if $RestartService
 				
-				if ($invokeReturnCode -eq '0') {
-					
-					Write-Verbose -Message "Success - $returnCodeResult"
-					
-					$requestRestart = Read-Host -Prompt 'Would you like to try to restart the service? (Y/N) '
-					
-					if ($requestRestart -eq 'Y') {
-						try {
-							Write-Verbose -Message "Restarting $serviceName service"
-							Get-Service -ComputerName $ComputerName -Name $serviceName | Restart-Service -Verbose
-							
-							Write-Verbose -Message "Service restart Complete. Checking $serviceName service type"
-							Get-ServiceType -ComputerName $ComputerName -ServiceName $ServiceName -Verbose
-						
-						} catch {
-							Write-Warning -Message "Error attempting service restart - $_"
-						} # end try/catch
-						
-					} # end if
-				} else {
-					Write-Warning -Message "Error: Something happened during execution. Double check parameter values."
-				} # end if/else
-			} # end 'Own'
-			
-			'Shared' {
-				$setIsolation = 32
+			} else {
 				
-				Write-Verbose -Message "Setting isolation to 'Shared' for the $serviceName service"
-				$invokeMethod = Get-WmiObject -ComputerName $ComputerName -Class win32_service -Filter "name='$serviceName'" |
-				Invoke-WmiMethod -Name Change -ArgumentList @($null, $null, $null, $null, $null, $null, $null, $setIsolation)
+				Write-Warning -Message "$computer - Unreachable via Ping"
 				
-				$invokeReturnCode = $invokeMethod.ReturnValue
-				$returnCodeResult = Get-ReturnCode -ReturnCode $invokeReturnCode
-				
-				if ($invokeReturnCode -eq '0') {
-					
-					Write-Verbose -Message "Success - $returnCodeResult"
-					
-					$requestRestart = Read-Host -Prompt 'Would you like to try to restart the service? (Y/N) '
-					
-					if ($requestRestart -eq 'Y') {
-						try {
-							Write-Verbose -Message "Restarting $serviceName service"
-							Get-Service -ComputerName $ComputerName -Name $serviceName | Restart-Service -Verbose
-							
-							Write-Verbose -Message "Service restart Complete. Checking $serviceName service type"
-							Get-ServiceType -ComputerName $ComputerName -ServiceName $ServiceName -Verbose
-							
-						} catch {
-							Write-Warning -Message "Error attempting service restart - $_"
-						} # end try/catch
-						
-					} # end if
-				} else {
-					Write-Warning -Message "Error: Something happened during execution. Double check parameter values."
-				} # end if/else
-			} # end 'Shared'
-		} # end switch block
+			} # end if/else
+		} # end foreach $computer
 		
 	} # end PROCESS block
 	
 	END {
+		#Write-Verbose -Message 'Entering END block'
 		#
 	} # end END block
 	
-} # end function Set-ServiceType
+} # end function Set-ServiceProcessIsolation
 
 Export-ModuleMember *
