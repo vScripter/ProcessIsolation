@@ -3,10 +3,11 @@
 This module can be used to find and isolate service processes, mainly for troubleshooting.
 
 It consists of 3 functions:
-* [**Get-ProcessServices**](Get-ProcessServices)
+* [**Get-ProcessServices**](#Get-ProcessServices)
 * **Get-ServiceType**
 * **Set-ServiceType**
 
+<a name="Get-ProcessServices">
 ## Get-ProcessServices
 
 At it's core, this function executes:
