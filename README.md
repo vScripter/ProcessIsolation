@@ -10,6 +10,8 @@ This module consists of 3 functions that can be used to find and isolate service
 
 <a name="Installation">
 ## Installation
+[***Back to top***](#Title)
+
 1. Clone, Fork or download the .zip of the master source code
 2. If you download the source:
   * Un-Block the .zip before un-zipping
