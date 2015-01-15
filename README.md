@@ -1,15 +1,39 @@
 <a name="Title">
 # Process Isolation Module
 
-This module can be used to find and isolate service processes, mainly for troubleshooting.
+This module consists of 3 functions that can be used to find and isolate service processes, mainly for troubleshooting.
 
-It consists of 3 functions:
+|Table of Contents|
+|-----------------|
+|[Installation](#Installation)|
+|[Functions](#Functions)|
+
+<a name="Installation">
+## Installation
+1. Clone, Fork or download the .zip of the master source code
+2. If you download the source:
+  * Un-Block the .zip before un-zipping
+  * Un-zip the source code
+3. Move the 'ProcessIsolation' directory into a valid PSModulePath
+  * You can run the following, in PowerShell, to list valid directory sources:
+  ```
+  ($ENV:PSModulePath).split(';')
+  ```
+  * Open PowerShell and run:
+  ```
+  Import-Module ProcessIsolation
+  ```
+  * Note: You may need to adjust your ExecutionPolicy
+
+
+<a name="Functions">
+## Functions
 * [**Get-ProcessServices**](#Get-ProcessServices)
 * [**Get-ServiceType**](#Get-ServiceType)
 * [**Set-ServiceType**](#Set-ServiceType)
 
 <a name="Get-ProcessServices">
-## Get-ProcessServices
+### Get-ProcessServices
 [***Back to top***](#Title)
 
 At it's core, this function executes:
@@ -46,7 +70,7 @@ localhost    svchost.exe 9460      stisvc
 ```
 
 <a name="Get-ServiceType">
-## Get-ServiceType
+### Get-ServiceType
 [***Back to top***](#Title)
 
 This function uses WMI to gather detail about the service type (Shared/Own) on a designated computer/s. It also accepts pipeline input.
@@ -63,7 +87,7 @@ localhost    wuauserv    Windows Update           Running Shared
 ```
 
 <a name="Set-ServiceType">
-## Set-ServiceType
+### Set-ServiceType
 [***Back to top***](#Title)
 
 This function uses WMI to actually set the desired service type to either 'Shared' or 'Own'.
