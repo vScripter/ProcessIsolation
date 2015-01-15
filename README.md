@@ -3,10 +3,11 @@
 
 This module consists of 3 functions that can be used to find and isolate service processes, mainly for troubleshooting.
 
-|Table of Contents|
+|Navigation|
 |-----------------|
 |[Installation](#Installation)|
 |[Functions](#Functions)|
+|[Links](#Links)|
 
 <a name="Installation">
 ## Installation
@@ -114,3 +115,7 @@ ServiceDescription : Windows Update
 ServiceStatus      : Running
 ServiceType        : Own
 ```
+
+<a name="Links">
+## Links
+* [MSDN win32_service 'Change' method](http://msdn.microsoft.com/en-us/library/aa384901(v=vs.85).aspx)
