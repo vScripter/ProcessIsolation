@@ -4,8 +4,8 @@ This module can be used to find and isolate service processes, mainly for troubl
 
 It consists of 3 functions:
 * [**Get-ProcessServices**](#Get-ProcessServices)
-* **Get-ServiceType**
-* **Set-ServiceType**
+* [**Get-ServiceType**](#Get-ServiceType)
+* [**Set-ServiceType**](#Set-ServiceType)
 
 <a name="Get-ProcessServices">
 ## Get-ProcessServices
@@ -43,6 +43,7 @@ localhost    svchost.exe 4940      PolicyAgent
 localhost    svchost.exe 9460      stisvc
 ```
 
+<a name="Get-ServiceType">
 ## Get-ServiceType
 
 This function uses WMI to gather detail about the service type (Shared/Own) on a designated computer/s. It also accepts pipeline input.
@@ -58,6 +59,7 @@ ComputerName ServiceName ServiceDescription ServiceStatus ServiceType
 localhost    wuauserv    Windows Update           Running Shared
 ```
 
+<a name="Set-ServiceType">
 ## Set-ServiceType
 
 This function uses WMI to actually set the desired service type to either 'Shared' or 'Own'.
