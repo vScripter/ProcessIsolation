@@ -42,7 +42,7 @@ This module consists of 3 functions that can be used to find and isolate service
 * [**Set-ServiceType**](#Set-ServiceType)
 
 <a name="Get-ProcessServices">
-### Get-ProcessServices
+#### Get-ProcessServices
 [***Back to top***](#Title)
 
 At it's core, this function executes:
@@ -79,7 +79,7 @@ localhost    svchost.exe 9460      stisvc
 ```
 
 <a name="Get-ServiceType">
-### Get-ServiceType
+#### Get-ServiceType
 [***Back to top***](#Title)
 
 This function uses WMI to gather detail about the service type (Shared/Own) on a designated computer/s. It also accepts pipeline input.
@@ -96,7 +96,7 @@ localhost    wuauserv    Windows Update           Running Shared
 ```
 
 <a name="Set-ServiceType">
-### Set-ServiceType
+#### Set-ServiceType
 [***Back to top***](#Title)
 
 This function uses WMI to actually set the desired service type to either 'Shared' or 'Own'.
