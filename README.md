@@ -50,7 +50,7 @@ At it's core, this function executes:
 tasklist.exe /S $computer /SVC /FI "IMAGENAME eq $processName" /FO CSV
 ```
 
-Which is then sent to ConvertFrom-CSV
+Which is then sent to `ConvertFrom-CSV`
 
 This function supports pipeline input, **however**, be very careful gathering information on a process name that may be running multiple instances.
 
@@ -82,7 +82,7 @@ localhost    svchost.exe 9460      stisvc
 #### Get-ServiceType
 [***Back to top***](#Title)
 
-This function uses WMI to gather detail about the service type (Shared/Own) on a designated computer/s. It also accepts pipeline input.
+This function uses WMI to gather detail about the service type (Share/Own) on a designated computer/s. It also accepts pipeline input.
 
 ```
 C:\> Get-ServiceType -ServiceName wuauserv -Verbose| ft -a
@@ -92,14 +92,14 @@ VERBOSE: Checking 'wuauserv' service type on localhost
 
 ComputerName ServiceName ServiceDescription ServiceStatus ServiceType
 ------------ ----------- ------------------ ------------- -----------
-localhost    wuauserv    Windows Update           Running Shared
+localhost    wuauserv    Windows Update           Running Share
 ```
 
 <a name="Set-ServiceType">
 #### Set-ServiceType
 [***Back to top***](#Title)
 
-This function uses WMI to actually set the desired service type to either 'Shared' or 'Own'.
+This function uses WMI to actually set the desired service type to either 'Share' or 'Own'.
 
 Since this can potentially produce undesired activity, this function fully supports -WhatIf and -Confirm.
 
