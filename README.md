@@ -23,8 +23,8 @@ This module consists of 3 functions that can be used to find and isolate service
   * Un-Block the .zip before un-zipping
   * Un-zip the source code
 
-3. Move the 'ProcessIsolation' directory into a valid PSModulePath
-  * You can run the following, in PowerShell, to list valid directory sources:
+3. Move the 'ProcessIsolation' directory into a valid PSModulePath directory
+  * You can run the following, in PowerShell, to list valid directories:
   ```powershell
   ($ENV:PSModulePath).split(';')
   ```
