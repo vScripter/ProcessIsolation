@@ -252,7 +252,7 @@ function Get-ServiceType {
 						if ($svcCheck.ServiceType -eq 'Win32OwnProcess') {
 							'Own'
 						} elseif ($svcCheck.ServiceType -eq 'Win32ShareProcess') {
-							'Shared'
+							'Share'
 						} else {
 							$svcCheck.ServiceType
 						} # end if/elseif/else $svcCheck.ServiceType
@@ -278,7 +278,7 @@ function Get-ServiceType {
 function Set-ServiceType {
 	<#
 	.SYNOPSIS
-		This function will set the isolation type to 'Own' or 'Shared' depending on your need
+		This function will set the isolation type to 'Own' or 'Share' depending on your need
 	.DESCRIPTION
 		This function uses WMI to set the desired isolation type for the given service
 
@@ -292,7 +292,7 @@ function Set-ServiceType {
 	.PARAMETER ServiceName
 		Name of service
 	.PARAMETER IsolationType
-		Select the type of isolation; either 'Own' or 'Shared'
+		Select the type of isolation; either 'Own' or 'Share'
 	.PARAMETER RestartService
 		Use the switch to attempt to restart the service, after the type change is made
 	.INPUTS
@@ -348,7 +348,7 @@ function Set-ServiceType {
 				   Position = 2,
 				   ValueFromPipeline = $false,
 				   HelpMessage = "Select Isolation type (Valid Values Are 'Own' and 'Shared'")]
-		[validateset('Own', 'Shared')]
+		[validateset('Own', 'Share')]
 		[System.String]$IsolationType,
 		
 		[parameter(Mandatory = $false)]
@@ -362,7 +362,7 @@ function Set-ServiceType {
 		
 		if ($IsolationType -eq 'Own') {
 			$setIsolation = 16
-		} elseif ($IsolationType -eq 'Shared') {
+		} elseif ($IsolationType -eq 'Share') {
 			$setIsolation = 32
 		} # end if/else $IsolationType
 		
@@ -410,7 +410,7 @@ function Set-ServiceType {
 			)
 			
 			if ($PSCmdlet.ShouldProcess("$computer", "Setting Service '$serviceName' to type '$IsolationType'")) {
-				Write-Verbose -Message "Setting isolation to 'Own' for the '$serviceName' service on $computer"
+				Write-Verbose -Message "Setting isolation to '$IsolationType' for the '$serviceName' service on $computer"
 				try {
 					$invokeMethod = Get-WmiObject -ComputerName $Computer -Class win32_service -Filter "name='$serviceName'" -ErrorAction 'Stop' |
 					Invoke-WmiMethod -Name Change -ArgumentList @($null, $null, $null, $null, $null, $null, $null, $setIsolation) -ErrorAction 'Stop'
