@@ -249,9 +249,14 @@ function Get-ServiceType {
 						ServiceDescription = $svcCheck.DisplayName
 						ServiceStatus = $svcCheck.Status
 						ServiceType = $(
-						if ($svcCheck.ServiceType -eq 'Win32OwnProcess') { 'Own' }
-						if ($svcCheck.ServiceType -eq 'Win32ShareProcess') { 'Shared' }
-						)
+						if ($svcCheck.ServiceType -eq 'Win32OwnProcess') {
+							'Own'
+						} elseif ($svcCheck.ServiceType -eq 'Win32ShareProcess') {
+							'Shared'
+						} else {
+							$svcCheck.ServiceType
+						} # end if/elseif/else $svcCheck.ServiceType
+						) # end ServiceType property
 					} # end $objSvcCheck
 					
 					$objSvcCheck
