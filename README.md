@@ -16,7 +16,7 @@ This module consists of 3 functions that can be used to find and isolate service
 1. Clone, Fork or download the .zip of the master source code
   * To download, you can copy/paste this into a PowerShell console, and it will download the module into your ~\Downloads directory.
   ```powershell
-(New-Object System.Net.WebClient).DownloadFile("https://github.com/vN3rd/ProcessIsolation/archive/master.zip","$ENV:USERPROFILE\Downloads\ProcessIsolation.zip")
+(New-Object System.Net.WebClient).DownloadFile("https://github.com/vScripter/ProcessIsolation/archive/master.zip","$ENV:USERPROFILE\Downloads\ProcessIsolation.zip")
 ```
 
 2. If you download the source:

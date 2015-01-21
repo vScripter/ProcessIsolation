@@ -1,14 +1,14 @@
-﻿<#	
+﻿<#
 	===========================================================================
 	 Created with: 	SAPIEN Technologies, Inc., PowerShell Studio 2014 v4.1.75
 	 Created on:   	1/14/2015 8:52 AM
 	 Created by:   	Kevin Kirkpatrick
-	 Organization: 	
+	 Organization:
 	 Filename:     	ProcessIsolation.psm1
 	-------------------------------------------------------------------------
 	 Module Name: ProcessIsolation
 	===========================================================================
-	
+
 #>
 
 function Get-ProcessServices {
@@ -22,12 +22,12 @@ function Get-ProcessServices {
 		processes.
 
 		You can use this function to identify what you want to isolate and then use the Set-ServiceIsolation function to actually set isolation.
-	
+
 		WARNING: Avoid supplying pipeline input when working with a single, or multiple computers, and specifying a process that runs multiple instances of the same name (ex: svchost.exe).
 		If there are multiple instances of a process running (like svchost.exe), when you use pipeline input, like: {Get-Process svchost | Get-ProcessServices}
 		be aware that it will run over and over, the number of times equal to the number of process instances, therefore producing undesired output. This also goes for
-		specifying multiple computer names to Get-Process and then trying to send that list through the pipeline. 
-	
+		specifying multiple computer names to Get-Process and then trying to send that list through the pipeline.
+
 	.PARAMETER ComputerName
 		Name of computer you wish to run the command against.
 	.PARAMETER ProcessName
@@ -44,13 +44,13 @@ function Get-ProcessServices {
 		Get-Process -Name spoolsv -ComputerName SERVER1,SERVER2 | Get-ProcessServices -Verbose | Format-Table -AutoSize
 	.EXAMPLE
 		Get-Process -Name svchost | Select-Object -Unique | Get-ProcessServices -Verbose | Format-Table -AutoSize
-	
+
 		Per the warning note in the description, for running processes that have the same name, be sure to specify a single, unique process name when
 		sending data through the pipeline, for optimal results
 	.EXAMPLE
 		Get-Process -Name svchost -ComputerName SERVER1 | Select-Object -Unique | Get-ProcessServices -Verbose | Format-Table -AutoSize
-	
-		Per the warning note in the description, for running processes that have the same name, be sure to specify a single computer AND ans single unique 
+
+		Per the warning note in the description, for running processes that have the same name, be sure to specify a single computer AND ans single unique
 		process name when sending data through the pipeline, for optimal results
 	.EXAMPLE
 		Get-ProcessServices -ComputerName localhost -ProcessName svchost.exe -Verbose | Format-Table -AutoSize
@@ -76,8 +76,8 @@ localhost    svchost.exe 13704     wuauserv
 
 		#TAG:PUBLIC
 
-			GitHub: https://github.com/vN3rd
-			Twitter: @vN3rd
+			GitHub: https://github.com/vScripter
+			Twitter: @vScripter
 			Email: kevin@vmotioned.com
 			Blog: www.vMotioned.com
 
@@ -92,10 +92,10 @@ localhost    svchost.exe 13704     wuauserv
 	[-------------------------------------DISCLAIMER-------------------------------------]
 
 	.LINK
-		https://github.com/vN3rd
+		https://github.com/vScripter
 
 	#>
-	
+
 	[cmdletbinding(PositionalBinding = $true)]
 	param (
 		[parameter(Mandatory = $false,
@@ -104,7 +104,7 @@ localhost    svchost.exe 13704     wuauserv
 				   HelpMessage = 'Name of computer to query')]
 		[alias('CN', 'MachineName')]
 		[System.String[]]$ComputerName = 'localhost',
-		
+
 		[parameter(Mandatory = $true,
 				   Position = 1,
 				   ValueFromPipelineByPropertyName = $true,
@@ -112,54 +112,54 @@ localhost    svchost.exe 13704     wuauserv
 		[alias('Name', 'PN')]
 		[System.String]$ProcessName
 	)
-	
+
 	BEGIN {
 		#Write-Verbose -Message 'Entering BEGIN block'
-		
+
 	} # end BEGIN block
-	
+
 	PROCESS {
 		#Write-Verbose -Message 'Entering PROCESS block'
-		
+
 		if ($ComputerName -eq '.') {
 			$ComputerName = 'localhost'
 		}
-		
+
 		foreach ($computer in $ComputerName) {
 			if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
 				$taskListQuery = $null
 				$p = $null
-				
+
 				if (-not ($processName -like '*.exe')) {
 					$ProcessName = $ProcessName + '.exe'
 				} # end if
-				
+
 				Write-Verbose -Message "Gathering service associations on $computer"
 				$imageName = @{ name = 'ImageName'; Expression = { $_.'Image Name' } }
-				
+
 				$taskListQuery = tasklist.exe /S $computer /SVC /FI "IMAGENAME eq $processName" /FO CSV |
 				ConvertFrom-Csv |
 				Select-Object $imageName, PID, Services
-				
+
 				foreach ($p in $taskListQuery) {
 					$objTaskList = @()
-					
+
 					$objTaskList = [PSCustomObject] @{
 						ComputerName = $computer
 						ProcessName = $p.ImageName
 						ProcessID = $p.PID
 						Services = $p.Services
 					} # end $objTaskList
-					
+
 					$objTaskList
 				} # end foreach $p
 			} else {
 				Write-Warning -Message "$computer - Unreachable via Ping"
 			} # end if/else Test-Connection
 		} # end foreach $computer
-		
+
 	} # end PROCESS block
-	
+
 	END {
 		#Write-Verbose -Message 'Entering END block'
 		# Do cleanup work here
@@ -188,8 +188,8 @@ function Get-ServiceType {
 
 		#TAG:PUBLIC
 
-			GitHub: https://github.com/vN3rd
-			Twitter: @vN3rd
+			GitHub: https://github.com/vScripter
+			Twitter: @vScripter
 			Email: kevin@vmotioned.com
 			Blog: www.vMotioned.com
 
@@ -204,10 +204,10 @@ function Get-ServiceType {
 	[-------------------------------------DISCLAIMER-------------------------------------]
 
 	.LINK
-		https://github.com/vN3rd
+		https://github.com/vScripter
 
 	#>
-	
+
 	[cmdletbinding()]
 	param (
 		[parameter(Mandatory = $false,
@@ -216,7 +216,7 @@ function Get-ServiceType {
 				   HelpMessage = 'Enter name of computer')]
 		[alias('CN', 'MachineName')]
 		[System.String[]]$ComputerName = 'localhost',
-		
+
 		[parameter(Mandatory = $true,
 				   Position = 1,
 				   ValueFromPipelineByPropertyName = $true,
@@ -225,24 +225,24 @@ function Get-ServiceType {
 		[validatenotnullorempty()]
 		[System.String]$ServiceName
 	)
-	
+
 	BEGIN {
 		#Write-Verbose -Message 'Entering BEGIN block'
 		# begin stuff
 	} # end BEGIN block
-	
+
 	PROCESS {
 		#Write-Verbose -Message 'Entering PROCESS block'
-		
+
 		foreach ($computer in $ComputerName) {
 			if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
 				$objSvcCheck = @()
 				$svcCheck = $null
-				
+
 				try {
 					Write-Verbose -Message "Checking '$serviceName' service type on $computer"
 					$svcCheck = Get-Service -ComputerName $computer -Name $serviceName -ErrorAction 'Stop' | Select-Object Name, DisplayName, Status, ServiceType
-					
+
 					$objSvcCheck = [PSCustomObject] @{
 						ComputerName = $computer
 						ServiceName = $svcCheck.Name
@@ -258,7 +258,7 @@ function Get-ServiceType {
 						} # end if/elseif/else $svcCheck.ServiceType
 						) # end ServiceType property
 					} # end $objSvcCheck
-					
+
 					$objSvcCheck
 				} catch {
 					Write-Warning -Message "Error gathering services on $computer - $_"
@@ -267,9 +267,9 @@ function Get-ServiceType {
 				Write-Warning -Message "$computer - Unreachable via Ping"
 			} # end if/else
 		} # end foreach
-		
+
 	} # end PROCESS block
-	
+
 	END {
 		#Write-Verbose -Message 'Entering END block'
 	} # end END block
@@ -307,8 +307,8 @@ function Set-ServiceType {
 
 		#TAG:PUBLIC
 
-			GitHub: https://github.com/vN3rd
-			Twitter: @vN3rd
+			GitHub: https://github.com/vScripter
+			Twitter: @vScripter
 			Email: kevin@vmotioned.com
 			Blog: www.vMotioned.com
 
@@ -323,10 +323,10 @@ function Set-ServiceType {
 	[-------------------------------------DISCLAIMER-------------------------------------]
 
 	.LINK
-		https://github.com/vN3rd
+		https://github.com/vScripter
 
 	#>
-	
+
 	[cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 	param (
 		[parameter(Mandatory = $false,
@@ -335,7 +335,7 @@ function Set-ServiceType {
 				   HelpMessage = 'Enter name of computer')]
 		[alias('CN')]
 		[System.String[]]$ComputerName = 'localhost',
-		
+
 		[parameter(Mandatory = $true,
 				   Position = 1,
 				   ValueFromPipelineByPropertyName = $true,
@@ -343,35 +343,35 @@ function Set-ServiceType {
 		[alias('Name', 'N')]
 		[validatenotnullorempty()]
 		[System.String]$ServiceName,
-		
+
 		[parameter(Mandatory = $true,
 				   Position = 2,
 				   ValueFromPipeline = $false,
 				   HelpMessage = "Select Isolation type (Valid Values Are 'Own' and 'Shared'")]
 		[validateset('Own', 'Share')]
 		[System.String]$IsolationType,
-		
+
 		[parameter(Mandatory = $false)]
 		[switch]$RestartService
 	)
-	
+
 	BEGIN {
 		#Write-Verbose -Message 'Entering BEGIN block'
-		
+
 		[int]$setIsolation = $null
-		
+
 		if ($IsolationType -eq 'Own') {
 			$setIsolation = 16
 		} elseif ($IsolationType -eq 'Share') {
 			$setIsolation = 32
 		} # end if/else $IsolationType
-		
+
 		function Get-ReturnCode {
 			[cmdletbinding()]
 			param ($ReturnCode)
-			
+
 			Write-Verbose -Message 'Getting return code'
-			
+
 			switch ($ReturnCode) {
 				'0' { 'The request was accepted.' }
 				'1' { 'The request is not supported.' }
@@ -400,7 +400,7 @@ function Set-ServiceType {
 				'24' { 'The service is currently paused in the system.' }
 			} # end switch block
 		} # end function Get-ReturnCode
-		
+
 		function Invoke-ServiceTypeChange {
 			[cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 			param (
@@ -408,23 +408,23 @@ function Set-ServiceType {
 				$ServiceName,
 				$IsolationType
 			)
-			
+
 			if ($PSCmdlet.ShouldProcess("$computer", "Setting Service '$serviceName' to type '$IsolationType'")) {
 				Write-Verbose -Message "Setting isolation to '$IsolationType' for the '$serviceName' service on $computer"
 				try {
 					$invokeMethod = Get-WmiObject -ComputerName $Computer -Class win32_service -Filter "name='$serviceName'" -ErrorAction 'Stop' |
 					Invoke-WmiMethod -Name Change -ArgumentList @($null, $null, $null, $null, $null, $null, $null, $setIsolation) -ErrorAction 'Stop'
-					
+
 					$invokeReturnCode = $invokeMethod.ReturnValue
 					$returnCodeResult = Get-ReturnCode -ReturnCode $invokeReturnCode
-					
+
 					if ($invokeReturnCode -eq '0') {
 						Write-Verbose -Message "SUCCESS: Service Type Change - $returnCodeResult"
 					} else {
 						Write-Warning -Message "ERROR: Service Type Change - $returnCodeResult"
 						Write-Warning -Message "Potential issues setting the service type on $computer. Please manually investigate."
 					} # end if/else $invokeReturnCode
-					
+
 				} catch {
 					Write-Warning -Message "Error invoking WMI method on $computer"
 					Write-Warning -Message 'Exiting'
@@ -432,56 +432,56 @@ function Set-ServiceType {
 				} # end try/catch block
 			} # end if $PSCmdlet.ShouldProcess
 		} # end function Invoke-ServiceTypeChange
-		
+
 		function Restart-SelectedService {
 			[cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 			param (
 				$Computer,
 				$ServiceName
 			)
-			
+
 			if ($PSCmdlet.ShouldProcess("$computer", "Restarting Service '$serviceName'")) {
 				try {
 					Get-Service -ComputerName $Computer -Name $serviceName | Restart-Service -Verbose
-					
+
 					Get-ServiceType -ComputerName $Computer -ServiceName $ServiceName -Verbose
-					
+
 				} catch {
 					Write-Warning -Message "Error attempting service restart - $_"
 				} # end try/catch
 			} # end if $PSCmdlet.ShouldProcess
 		} # end function Restart-SelectedService
-		
+
 	} # end BEGIN block
-	
+
 	PROCESS {
 		#Write-Verbose -Message 'Entering PROCESS block'
-		
+
 		foreach ($computer in $ComputerName) {
 			if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
-				
+
 				Invoke-ServiceTypeChange -Computer $computer -ServiceName $ServiceName -IsolationType $IsolationType
-				
+
 				if ($RestartService) {
-					
+
 					Restart-SelectedService -Computer $computer -ServiceName $ServiceName
-					
+
 				} # end if $RestartService
-				
+
 			} else {
-				
+
 				Write-Warning -Message "$computer - Unreachable via Ping"
-				
+
 			} # end if/else
 		} # end foreach $computer
-		
+
 	} # end PROCESS block
-	
+
 	END {
 		#Write-Verbose -Message 'Entering END block'
 		#
 	} # end END block
-	
+
 } # end function Set-ServiceProcessIsolation
 
 Export-ModuleMember *
