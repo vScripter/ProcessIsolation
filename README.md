@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/vScripter/ProcessIsolation.png?label=ready&title=Ready)](https://waffle.io/vScripter/ProcessIsolation)
 <a name="Title">
 # Process Isolation Module
 
