@@ -1,5 +1,7 @@
 [![Stories in Ready](https://badge.waffle.io/vScripter/ProcessIsolation.png?label=ready&title=Ready)](https://waffle.io/vScripter/ProcessIsolation)
 <a name="Title">
+
+
 # Process Isolation Module
 
 This module consists of 3 functions that can be used to find and isolate service processes, mainly for troubleshooting.
@@ -9,6 +11,7 @@ This module consists of 3 functions that can be used to find and isolate service
 |[Installation](#Installation)|
 |[Functions](#Functions)|
 |[Links](#Links)|
+|[Waffle Charts](#Waffle)|
 
 <a name="Installation">
 ## Installation
@@ -126,3 +129,10 @@ ServiceType        : Own
 <a name="Links">
 ## Links
 * [MSDN win32_service 'Change' method](http://msdn.microsoft.com/en-us/library/aa384901(v=vs.85).aspx)
+
+<a name="Waffle">
+## Waffle Charts
+[***Back to top***](#Title)
+
+**Waffle Throughput** <br>
+  [![Throughput Graph](https://graphs.waffle.io/vscripter/wafflestatus/throughput.svg)](https://waffle.io/vscripter/wafflestatus/metrics)
